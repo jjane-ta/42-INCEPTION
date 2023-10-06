@@ -1,0 +1,66 @@
+version: '3.8'
+name: inception
+
+x-services-common-configs: &common-configs
+  domainname: ${DOMAIN_NAME}
+  init: true
+  restart: always
+  env_file: ./.env
+  logging:
+    driver: "json-file"
+    options:
+      max-file: "5"
+      max-size: "2048m"
+
+services:
+  nginx:
+    hostname: nginx
+    <<: *common-configs
+    build: ./requirements/nginx
+    volumes: 
+      - $DATA/www-data:/var/www/${DOMAIN_NAME}
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - front-tier
+  wordpress:
+    hostname: wordpress
+    <<: *common-configs
+    build: ./requirements/wordpress
+    depends_on: 
+      - mariadb
+    environment:
+      - WORDPRESS_DB_HOST=mariadb:3306
+      - WORDPRESS_DB_USER=$MYSQL_USER
+      - WORDPRESS_DB_PASSWORD=$MYSQL_PASSWORD
+      - WORDPRESS_DB_NAME=$MYSQL_DATABASE
+    volumes:
+      - $DATA/www-data:/var/www/${DOMAIN_NAME}
+    networks:
+      - front-tier
+      - back-tier
+  mariadb:
+    hostname: mariadb
+    <<: *common-configs
+    build: ./requirements/mariadb
+    volumes:
+      - $DATA/db-data:/var/lib/mysql
+    networks:
+      - back-tier
+
+networks:
+  front-tier:
+    driver: bridge
+  back-tier:
+    driver: bridge
+
+# healthcheck:
+#   test: ["CMD", "curl", "-f", "http://localhost"]
+#   interval: 1m30s
+#   timeout: 10s
+#   retries: 3
+#   start_period: 40s
+#   start_interval: 5s
+
+
