@@ -7,6 +7,4 @@ RUN apt install -y php-curl php-gd php-intl php-mbstring php-soap php-xml php-xm
 RUN curl https://wordpress.org/latest.tar.gz |  tar zx -C /
 
 COPY ./ /
-RUN chmod +x /docker-entrypoint.sh
-
-ENTRYPOINT  ["/docker-entrypoint.sh"]
+ENTRYPOINT  ["bash", "/docker-entrypoint.sh"]

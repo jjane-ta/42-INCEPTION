@@ -1,13 +1,15 @@
 #!/bin/bash
 
+set -eo pipefail
+
 NGINX_CONFIG_FILE=/etc/nginx/conf.d/server.conf
 FASTCGI_HOST=wordpress
 FASTCGI_PORT=9000
-DOLLAR='$'
 
 unlink /etc/nginx/sites-enabled/default
 cp /conf/snippets/* /etc/nginx/snippets
 
+DOLLAR='$'
 cat << EOF > $NGINX_CONFIG_FILE
 server {
     listen 443 ssl ;

@@ -2,18 +2,16 @@
 
 set -eo pipefail
 
+WORDPRESS_CONF_FILE=/var/www/html/wp-config.php
+
 if [[  "$(ls /var/www/html/)" == "" ]];then
     echo "[i] Installing wordpress"
     cp -a /wordpress/* /var/www/html
 fi
 rm -fr wordpress /latest.tar.gz
 
-
-WORDPRESS_CONF_FILE=/var/www/html/wp-config.php
-
 echo "[i] Configuring wordpress"
-
-echo '<?php'  > $WORDPRESS_CONF_FILE # HEATHER
+echo '<?php'  > $WORDPRESS_CONF_FILE # HEADER
 
 cat << BODY >> $WORDPRESS_CONF_FILE # VARS
 define( 'DB_NAME', '$MYSQL_DATABASE' );
