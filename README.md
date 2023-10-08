@@ -3,6 +3,5 @@
 
 [usage]
 
-make install
-make
+make install; make
 
