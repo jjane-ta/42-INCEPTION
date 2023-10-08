@@ -2,7 +2,6 @@ version: '3.8'
 name: inception
 
 x-services-common-configs: &common-configs
-  domainname: ${DOMAIN_NAME}
   init: true
   restart: always
   env_file: ./.env
@@ -17,26 +16,22 @@ services:
     hostname: nginx
     <<: *common-configs
     build: ./requirements/nginx
+    depends_on: 
+      - wordpress
     volumes: 
-      - $DATA/www-data:/var/www/${DOMAIN_NAME}
-    ports:
-      - 80:80
-      - 443:443
+      - $DATA/www-data:/var/www/html
     networks:
       - front-tier
+    ports:
+      - 443:443
   wordpress:
     hostname: wordpress
     <<: *common-configs
     build: ./requirements/wordpress
     depends_on: 
       - mariadb
-    environment:
-      - WORDPRESS_DB_HOST=mariadb:3306
-      - WORDPRESS_DB_USER=$MYSQL_USER
-      - WORDPRESS_DB_PASSWORD=$MYSQL_PASSWORD
-      - WORDPRESS_DB_NAME=$MYSQL_DATABASE
     volumes:
-      - $DATA/www-data:/var/www/${DOMAIN_NAME}
+      - $DATA/www-data:/var/www/html
     networks:
       - front-tier
       - back-tier
@@ -54,13 +49,3 @@ networks:
     driver: bridge
   back-tier:
     driver: bridge
-
-# healthcheck:
-#   test: ["CMD", "curl", "-f", "http://localhost"]
-#   interval: 1m30s
-#   timeout: 10s
-#   retries: 3
-#   start_period: 40s
-#   start_interval: 5s
-
-
